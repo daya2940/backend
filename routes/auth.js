@@ -8,12 +8,8 @@ const {userSignupValidator} = require('../validators/auth');
 const {userSigninValidator} = require('../validators/auth');
 
 
-
 router.post('/signup',runValidation,userSignupValidator,signup);
 router.post('/signin',runValidation,userSigninValidator,signin);
 router.get('/signout',signout);
-
-
-
 
 module.exports = router;

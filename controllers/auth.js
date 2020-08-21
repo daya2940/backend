@@ -3,6 +3,12 @@ const shortId = require('shortid');
 const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');
 
+
+exports.read = (req,res) => {
+  req.profie.hashed_password = undefined;
+  return res.json(req.profile);
+}
+
 exports.signup = (req, res) => {
   User.findOne({ email: req.body.email }).exec((err, user) => {
     if (user) {
@@ -69,5 +75,37 @@ exports.signout =(req,res) => {
 
 exports.requireSignin = expressJwt({
   secret: process.env.JWT_SECRET,
-  algorithms: ['RS256']
+  algorithms:['HS256']
 })
+
+// role based authentication
+exports.authMiddleware = (req,res,next) => {
+  const authUserId = req.user._id;
+  User.findById({_id:authUserId}).exec((err, user) => {
+    if(err || !user){
+      return res.status(400).json({
+        error: 'User not found'
+      });
+    }
+    req.profile=user;
+    next();
+  });
+}
+
+exports.adminMiddleware = (req,res,next) => {
+  const adminUserId = req.user._id;
+  User.findById({_id:adminUserId}).exec((err, user) => {
+    if(err || !user){
+      return res.status(400).json({
+        error: 'User not found'
+      });
+    }
+    if(user.role !=1){
+      return res.status(400).json({
+        error: 'Admin resource.Acess denied'
+      });
+    }
+    req.profile=user;
+    next();
+  });
+}
