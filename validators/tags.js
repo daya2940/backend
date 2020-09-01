@@ -1,0 +1,9 @@
+const {check} = require('express-validator');
+
+
+exports.CreateTagValidator = [
+  check('name')
+    .not()
+    .isEmpty()
+    .withMessage('Tag is required')
+];
